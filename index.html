@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Leo Lions Club of Alawwa Nexus — District 306 D11</title>
     <link rel="icon" type="image/webp" id="club-favicon">
     <style>
@@ -989,6 +989,13 @@
             pointer-events: none;
         }
 
+        /* Mobile-Only Helpers (strictly hidden on PC > 768px) */
+        .mobile-progress-track,
+        .mobile-chapter-bar,
+        .mobile-stage-scrim {
+            display: none;
+        }
+
         /* Responsive Refinements */
         @media (max-width: 1024px) {
             .cinematic-container {
@@ -1042,67 +1049,460 @@
             }
         }
 
-        @media (max-width: 720px) {
+        /* Dedicated Mobile Portrait Experience (<= 768px — zero impact on PC) */
+        @media (max-width: 768px) {
             .header-nav {
                 display: none;
             }
+
             .cinematic-container {
-                padding: 0 20px 22px 20px;
+                height: 100vh;
+                height: 100dvh;
+                padding: env(safe-area-inset-top, 0px) 20px calc(14px + env(safe-area-inset-bottom, 0px)) 20px;
             }
+
+            .main-header {
+                height: 60px;
+            }
+
+            .brand {
+                gap: 10px;
+            }
+
+            .brand-logo-wrap {
+                width: 36px;
+                height: 36px;
+            }
+
+            .brand-logo {
+                width: 32px;
+                height: 32px;
+            }
+
+            .brand-title {
+                font-size: 11.5px;
+                letter-spacing: 3.2px;
+            }
+
+            .brand-sub {
+                font-size: 7.5px;
+                letter-spacing: 2px;
+            }
+
+            .contact-btn {
+                padding: 9px 16px;
+                font-size: 9.5px;
+                letter-spacing: 1.2px;
+                gap: 7px;
+            }
+
+            .grid-horizontal-line {
+                top: calc(60px + env(safe-area-inset-top, 0px));
+                background: rgba(255, 255, 255, 0.08);
+            }
+
+            /* Hairline Gold-Violet Scroll Progress Ribbon along Header Divider */
+            .mobile-progress-track {
+                display: block;
+                position: fixed;
+                top: calc(60px + env(safe-area-inset-top, 0px));
+                left: 0;
+                width: 100%;
+                height: 2px;
+                background: rgba(255, 255, 255, 0.06);
+                z-index: 22;
+                pointer-events: none;
+            }
+
+            .mobile-progress-fill {
+                width: 0%;
+                height: 100%;
+                background: linear-gradient(90deg, var(--nexus-violet), var(--sovereign-gold));
+                box-shadow: 0 0 8px rgba(230, 198, 138, 0.6);
+                transition: width 0.08s linear;
+            }
+
+            /* Sleek Floating Mobile Chapter Switcher */
+            .mobile-chapter-bar {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 4px;
+                position: fixed;
+                top: calc(70px + env(safe-area-inset-top, 0px));
+                left: 16px;
+                right: 16px;
+                padding: 4px;
+                border-radius: 999px;
+                background: rgba(8, 4, 18, 0.62);
+                backdrop-filter: blur(14px);
+                -webkit-backdrop-filter: blur(14px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                z-index: 25;
+                pointer-events: auto;
+            }
+
+            .mobile-chapter-btn {
+                padding: 6px 4px;
+                border-radius: 999px;
+                border: 1px solid transparent;
+                background: transparent;
+                color: rgba(255, 255, 255, 0.58);
+                font-family: 'Outfit', sans-serif;
+                font-size: 9px;
+                font-weight: 500;
+                letter-spacing: 1.3px;
+                text-transform: uppercase;
+                text-align: center;
+                transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .mobile-chapter-btn.active-nav {
+                background: linear-gradient(135deg, rgba(106, 34, 162, 0.62), rgba(0, 51, 142, 0.52));
+                border-color: rgba(230, 198, 138, 0.48);
+                color: var(--warm-ivory);
+                box-shadow: 0 2px 12px rgba(106, 34, 162, 0.35);
+            }
+
+            /* Bottom Velvet Vignette Scrim so Upper 3D Sculpture stays crisp & Lower Copy reads effortlessly */
+            .mobile-stage-scrim {
+                display: block;
+                position: fixed;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                height: 55vh;
+                height: 55dvh;
+                z-index: 6;
+                pointer-events: none;
+                background: linear-gradient(
+                    to top,
+                    rgba(2, 1, 7, 0.96) 0%,
+                    rgba(5, 2, 14, 0.84) 46%,
+                    rgba(5, 2, 14, 0.34) 78%,
+                    rgba(0, 0, 0, 0) 100%
+                );
+            }
+
+            /* Declutter inner vertical grid lines on narrow screens; keep subtle outer frame rails */
+            .grid-lines {
+                left: 12px;
+                right: 12px;
+                width: calc(100% - 24px);
+                height: 100vh;
+                height: 100dvh;
+            }
+
+            .grid-line {
+                background: rgba(255, 255, 255, 0.05);
+            }
+
+            .grid-line:nth-child(2),
+            .grid-line:nth-child(3),
+            .grid-line:nth-child(4),
+            .story-dashes {
+                display: none;
+            }
+
+            .grid-dot {
+                width: 4px;
+                height: 4px;
+                opacity: 0.65;
+            }
+
+            /* Editorial Slides Anchored in Lower Velvet Zone */
+            .slide {
+                left: 20px !important;
+                right: 20px;
+                width: calc(100vw - 40px) !important;
+                max-width: none !important;
+                bottom: calc(42px + env(safe-area-inset-bottom, 0px));
+            }
+
+            .slide-eyebrow {
+                margin-left: 0 !important;
+                font-size: 8.5px;
+                letter-spacing: 2.2px;
+                margin-bottom: 8px;
+                gap: 8px;
+            }
+
+            .slide-eyebrow::before {
+                width: 16px;
+            }
+
+            .slide-title {
+                margin-left: 0 !important;
+                font-size: clamp(38px, 10.8vw, 50px);
+                line-height: 0.96;
+                letter-spacing: 1px;
+                margin-bottom: 11px;
+            }
+
+            .slide-desc {
+                margin-left: 0 !important;
+                width: 100% !important;
+                max-width: none !important;
+                min-width: 0 !important;
+                font-size: 13.5px;
+                line-height: 1.56;
+            }
+
+            /* Slide 1 Twin-Stanza Mobile Hierarchy */
             #slide-1 .desc-row {
                 flex-direction: column;
-                gap: 12px;
+                gap: 9px;
             }
-            #slide-1 .slide-eyebrow,
-            #slide-1 .slide-title,
-            #slide-1 .col-1 {
-                margin-left: 20px;
-                width: calc(100vw - 48px);
-                max-width: none;
-            }
+
             #slide-1 .col-2 {
                 position: static;
-                margin-left: 20px;
-                width: calc(100vw - 48px);
-                max-width: none;
+                font-size: 12.2px;
+                line-height: 1.48;
+                color: rgba(238, 214, 170, 0.88);
+                padding-left: 11px;
+                border-left: 1.5px solid rgba(157, 92, 229, 0.65);
             }
+
+            /* Slide 2 Jewel-Framed Lion Sculpture Badge beside Title (leaves upper 3D stage clear) */
             #slide-2-img {
-                top: 88px;
-                left: 20px;
-                width: 132px;
+                top: auto;
+                left: auto;
+                right: 20px;
+                bottom: calc(168px + env(safe-area-inset-bottom, 0px));
+                width: 86px;
+                height: 86px;
+                border-radius: 14px;
+                border: 1px solid rgba(230, 198, 138, 0.38);
+                box-shadow: 0 12px 28px rgba(0, 0, 0, 0.78);
+                z-index: 12;
             }
-            #slide-2 .slide-eyebrow,
+
+            #slide-2-img::after {
+                display: none;
+            }
+
             #slide-2 .slide-title,
-            #slide-2 .slide-desc {
-                margin-left: 20px;
-                width: calc(100vw - 48px);
-                max-width: none;
+            #slide-2 .slide-eyebrow {
+                max-width: calc(100% - 100px);
             }
-            #slide-3 {
-                left: 20px;
-                width: calc(100vw - 48px);
-            }
+
+            /* Slide 3 Swipeable Touch Pill Ribbon */
             #slide-3 .slide-title {
                 white-space: normal;
             }
-            #slide-4 {
-                left: 20px;
+
+            .cause-tags {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                max-width: 100%;
+                gap: 7px;
+                margin-top: 13px;
+                padding-bottom: 2px;
             }
+
+            .cause-tags::-webkit-scrollbar {
+                display: none;
+            }
+
+            .cause-tag {
+                flex-shrink: 0;
+                padding: 8px 14px;
+                font-size: 9.5px;
+                letter-spacing: 1.3px;
+                background: rgba(20, 12, 38, 0.78);
+            }
+
+            /* Slide 4 Ergonomic Side-by-Side Thumb Actions */
             .slide-cta-row {
-                flex-wrap: wrap;
-                gap: 12px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                margin-top: 16px;
+                width: 100%;
             }
+
+            .cta-primary,
+            .cta-secondary {
+                justify-content: center;
+                padding: 13px 12px;
+                font-size: 9.8px;
+                letter-spacing: 1.2px;
+                text-align: center;
+                white-space: nowrap;
+            }
+
+            /* Compact Mobile HUD Footer */
+            .hud-footer {
+                font-size: 8.5px;
+                letter-spacing: 1.8px;
+                justify-content: space-between;
+            }
+
+            .hud-coords {
+                display: flex;
+                gap: 8px;
+            }
+
+            .hud-coords span:first-child,
+            .hud-divider {
+                display: none;
+            }
+
+            /* Native Bottom-Sheet Secretariat Modal on Mobile */
+            .nexus-modal-backdrop {
+                align-items: flex-end;
+                padding: 0;
+            }
+
             .nexus-modal {
-                padding: 26px 22px;
+                max-width: 100%;
+                max-height: 90vh;
+                max-height: 90dvh;
+                border-radius: 24px 24px 0 0;
+                border-left: none;
+                border-right: none;
+                border-bottom: none;
+                padding: 26px 20px calc(24px + env(safe-area-inset-bottom, 0px)) 20px;
+                transform: translateY(100%);
+                -webkit-overflow-scrolling: touch;
+                touch-action: pan-y;
             }
+
+            .nexus-modal::before {
+                content: '';
+                display: block;
+                width: 40px;
+                height: 4px;
+                border-radius: 999px;
+                background: rgba(255, 255, 255, 0.22);
+                margin: -10px auto 18px auto;
+            }
+
+            .nexus-modal-backdrop.open .nexus-modal {
+                transform: translateY(0);
+            }
+
+            .modal-close {
+                top: 18px;
+                right: 18px;
+                width: 34px;
+                height: 34px;
+            }
+
+            .modal-crest-header {
+                gap: 14px;
+                padding-bottom: 18px;
+                margin-bottom: 18px;
+                padding-right: 34px;
+            }
+
+            .modal-crest-img {
+                width: 58px;
+                height: 58px;
+            }
+
+            .modal-lockup-eyebrow {
+                font-size: 8.5px;
+                letter-spacing: 2px;
+            }
+
+            .modal-lockup-title {
+                font-size: 24px;
+            }
+
+            .modal-lockup-meta {
+                font-size: 11px;
+                line-height: 1.4;
+            }
+
+            .modal-stats-strip {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+                margin-bottom: 18px;
+            }
+
+            .modal-stat-card {
+                padding: 10px 8px;
+                text-align: center;
+            }
+
+            .modal-stat-val {
+                font-size: 17px;
+            }
+
+            .modal-stat-lbl {
+                font-size: 7.5px;
+                letter-spacing: 1px;
+            }
+
+            .modal-tabs {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                margin-bottom: 16px;
+            }
+
+            .modal-tab {
+                padding: 10px 8px;
+                font-size: 9.5px;
+                letter-spacing: 1.1px;
+                text-align: center;
+            }
+
             .nexus-form {
                 grid-template-columns: 1fr;
+                gap: 12px;
             }
-            .modal-stats-strip {
+
+            /* 16px prevents iOS Safari auto-zoom on input focus */
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                font-size: 16px;
+                padding: 11px 13px;
+            }
+
+            .form-submit-row {
+                flex-direction: column-reverse;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            .form-submit-row .cta-primary {
+                width: 100%;
+                padding: 14px 20px;
+                font-size: 11px;
+            }
+
+            .form-note {
+                text-align: center;
+                font-size: 10.5px;
+            }
+        }
+
+        /* Compact Small-Phone Refinement (iPhone SE / <= 385px) */
+        @media (max-width: 385px) {
+            .slide-title {
+                font-size: 34px;
+                margin-bottom: 8px;
+            }
+            .slide-desc {
+                font-size: 12.6px;
+                line-height: 1.48;
+            }
+            #slide-1 .col-2 {
+                font-size: 11.5px;
+            }
+            #slide-2-img {
+                width: 72px;
+                height: 72px;
+                bottom: calc(154px + env(safe-area-inset-bottom, 0px));
+            }
+            .slide-cta-row {
                 grid-template-columns: 1fr;
-            }
-            .hud-coords {
-                display: none;
+                gap: 8px;
             }
         }
 
@@ -1228,6 +1628,18 @@
             </div>
         </footer>
     </div>
+
+    <!-- Mobile-Only Progress Ribbon, Chapter Switcher & Bottom Stage Scrim (hidden on PC > 768px) -->
+    <div class="mobile-progress-track" aria-hidden="true">
+        <div class="mobile-progress-fill" id="mobile-progress-fill"></div>
+    </div>
+    <nav class="mobile-chapter-bar" aria-label="Mobile chapters">
+        <button type="button" class="mobile-chapter-btn active-nav" data-mobile-nav="0">01 Nexus</button>
+        <button type="button" class="mobile-chapter-btn" data-mobile-nav="1">02 Spirit</button>
+        <button type="button" class="mobile-chapter-btn" data-mobile-nav="2">03 Impact</button>
+        <button type="button" class="mobile-chapter-btn" data-mobile-nav="3">04 Charter</button>
+    </nav>
+    <div class="mobile-stage-scrim" aria-hidden="true"></div>
 
     <!-- Architectural Grid Lines & Stories Scroll Progress -->
     <div class="grid-horizontal-line"></div>
@@ -1546,6 +1958,16 @@
             navLinks.forEach((link, idx) => {
                 link.classList.toggle('active-nav', idx === chapterIdx);
             });
+
+            const mobileBtns = document.querySelectorAll('.mobile-chapter-btn');
+            mobileBtns.forEach((btn, idx) => {
+                btn.classList.toggle('active-nav', idx === chapterIdx);
+            });
+
+            const mobileFill = document.getElementById('mobile-progress-fill');
+            if (mobileFill) {
+                mobileFill.style.width = `${Math.max(0, Math.min(100, scroll * 100))}%`;
+            }
         }
 
         // Smooth Scroll Navigation + Modal Wiring + Interactive Cursor Hover States
@@ -1557,6 +1979,17 @@
                     e.preventDefault();
                     const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
                     const targetY = maxScroll * targetScrolls[index];
+                    window.scrollTo({ top: targetY, behavior: 'smooth' });
+                });
+            });
+
+            const mobileChapterBtns = document.querySelectorAll('.mobile-chapter-btn');
+            mobileChapterBtns.forEach((btn) => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const idx = Number(btn.dataset.mobileNav || 0);
+                    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+                    const targetY = maxScroll * targetScrolls[idx];
                     window.scrollTo({ top: targetY, behavior: 'smooth' });
                 });
             });
@@ -1664,7 +2097,7 @@
             }
         }
 
-        // Pointer Tracking
+        // Pointer Tracking (PC Mouse + Passive Mobile Touch-Glide Tilt)
         window.addEventListener('mousemove', (event) => {
             cursorX = event.clientX;
             cursorY = event.clientY;
@@ -1676,6 +2109,19 @@
             targetMouseX = (event.clientX / window.innerWidth) * 2 - 1;
             targetMouseY = (event.clientY / window.innerHeight) * 2 - 1;
         });
+
+        window.addEventListener('touchmove', (event) => {
+            if (event.touches && event.touches.length > 0) {
+                const t = event.touches[0];
+                targetMouseX = ((t.clientX / Math.max(1, window.innerWidth)) * 2 - 1) * 0.65;
+                targetMouseY = ((t.clientY / Math.max(1, window.innerHeight)) * 2 - 1) * 0.55;
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchend', () => {
+            targetMouseX = 0;
+            targetMouseY = 0;
+        }, { passive: true });
 
         // Update shared scroll & cursor physics each frame
         function stepSharedKinematics() {
@@ -2115,11 +2561,21 @@
                 const elapsed = clock.getElapsedTime();
 
                 const { scrollVelocity } = stepSharedKinematics();
+                const isMobile = sizes.width <= 768;
 
-                // Interactive mouse tilt + gentle sovereign breathing on the monument
+                // Interactive mouse/touch tilt + gentle sovereign breathing on the monument
                 modelPivot.rotation.y = mouseX * 0.25;
                 modelPivot.rotation.x = mouseY * 0.15;
-                modelPivot.position.y = -0.12 + Math.sin(elapsed * 0.9) * 0.045;
+
+                if (isMobile) {
+                    const aspect = sizes.width / Math.max(1, sizes.height);
+                    const mScale = Math.min(0.92, Math.max(0.46, (0.78 * 5.4 * 2.0 * 0.4663 * aspect) / 3.5));
+                    modelPivot.scale.setScalar(mScale);
+                    modelPivot.position.y = 0.56 + Math.sin(elapsed * 0.9) * 0.035;
+                } else {
+                    modelPivot.scale.setScalar(1.0);
+                    modelPivot.position.y = -0.12 + Math.sin(elapsed * 0.9) * 0.045;
+                }
 
                 // Subtle counter-rotation of celestial astrolabe rings & floating crystals
                 haloMesh1.rotation.z = elapsed * 0.08 + currentScroll * Math.PI;
@@ -2158,19 +2614,34 @@
 
                 // 360-degree camera orbit driven by scroll
                 const phi = currentScroll * Math.PI * 2.0;
-                const y = 0.35 + Math.sin(currentScroll * Math.PI) * 0.8;
-                const radius = 4.2 - Math.sin(currentScroll * Math.PI) * 0.6;
-                const x = radius * Math.sin(phi);
-                const z = radius * Math.cos(phi);
 
-                const transitionProgress = Math.min(1.0, currentScroll / 0.28);
-                const easeFactor = (Math.cos(transitionProgress * Math.PI) + 1.0) * 0.5;
-                const lookAtXOffset = -0.9 * easeFactor;
-                const targetLookAt = new THREE.Vector3(lookAtXOffset, -0.10, 0);
-                const targetPos = new THREE.Vector3(x, y, z);
+                if (isMobile) {
+                    // Portrait mobile stage: center horizontally & frame monument cleanly in upper viewport
+                    const y = 0.44 + Math.sin(currentScroll * Math.PI) * 0.55;
+                    const radius = 5.4 - Math.sin(currentScroll * Math.PI) * 0.42;
+                    const x = radius * Math.sin(phi);
+                    const z = radius * Math.cos(phi);
+                    const targetLookAt = new THREE.Vector3(0, -0.05, 0);
+                    const targetPos = new THREE.Vector3(x, y, z);
 
-                camera.position.lerp(targetPos, 0.025);
-                camera.lookAt(targetLookAt);
+                    camera.position.lerp(targetPos, 0.035);
+                    camera.lookAt(targetLookAt);
+                } else {
+                    // PC format (100% untouched)
+                    const y = 0.35 + Math.sin(currentScroll * Math.PI) * 0.8;
+                    const radius = 4.2 - Math.sin(currentScroll * Math.PI) * 0.6;
+                    const x = radius * Math.sin(phi);
+                    const z = radius * Math.cos(phi);
+
+                    const transitionProgress = Math.min(1.0, currentScroll / 0.28);
+                    const easeFactor = (Math.cos(transitionProgress * Math.PI) + 1.0) * 0.5;
+                    const lookAtXOffset = -0.9 * easeFactor;
+                    const targetLookAt = new THREE.Vector3(lookAtXOffset, -0.10, 0);
+                    const targetPos = new THREE.Vector3(x, y, z);
+
+                    camera.position.lerp(targetPos, 0.025);
+                    camera.lookAt(targetLookAt);
+                }
 
                 // Update Background Shader Uniforms
                 shaderUniforms.uTime.value = elapsed;
@@ -2273,11 +2744,18 @@
                 ctx.save();
                 ctx.scale(dpr, dpr);
 
+                const isMobileFallback = sizes.width <= 768;
                 const transitionProgress = Math.min(1.0, currentScroll / 0.28);
                 const easeFactor = (Math.cos(transitionProgress * Math.PI) + 1.0) * 0.5;
-                const cx = sizes.width * (0.5 + 0.16 * easeFactor) + mouseX * 18;
-                const cy = sizes.height * 0.49 + mouseY * 14 + Math.sin(elapsed * 0.9) * 6;
-                const scale = Math.min(sizes.width, sizes.height) * 0.21;
+                const cx = isMobileFallback
+                    ? sizes.width * 0.5 + mouseX * 10
+                    : sizes.width * (0.5 + 0.16 * easeFactor) + mouseX * 18;
+                const cy = isMobileFallback
+                    ? sizes.height * 0.36 + mouseY * 8 + Math.sin(elapsed * 0.9) * 5
+                    : sizes.height * 0.49 + mouseY * 14 + Math.sin(elapsed * 0.9) * 6;
+                const scale = isMobileFallback
+                    ? sizes.width * 0.22
+                    : Math.min(sizes.width, sizes.height) * 0.21;
                 const rotY = -currentScroll * Math.PI * 2 + mouseX * 0.25;
                 const rotX = mouseY * 0.15 + Math.sin(currentScroll * Math.PI) * 0.18;
 
