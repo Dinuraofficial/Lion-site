@@ -1524,6 +1524,9 @@
         @keyframes arrival-rise { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
         .showcase-link { display:inline-flex; align-items:center; gap:12px; margin-top:20px; padding:11px 0; border:0; border-bottom:1px solid rgba(230,198,138,.6); color:#f5ddad; background:none; font:500 11px 'Outfit',sans-serif; letter-spacing:.16em; text-transform:uppercase; }
         .showcase-link:hover { color:white; border-color:white; }
+        /* The chapter action must disappear with its slide, including from keyboard navigation. */
+        #showcase-open { opacity:0; visibility:hidden; pointer-events:none; transform:translateY(12px); transition:opacity .35s ease, transform .35s ease, visibility 0s linear .35s; }
+        #slide-3.active #showcase-open { opacity:1; visibility:visible; pointer-events:auto; transform:translateY(0); transition:opacity .5s ease .2s, transform .5s ease .2s, visibility 0s; }
         .showcase-backdrop { position:fixed; inset:0; z-index:550; display:flex; justify-content:center; align-items:center; padding:24px; background:rgba(3,1,8,.84); backdrop-filter:blur(18px); }
         .showcase-backdrop[hidden] { display:none; }
         .showcase-panel { position:relative; width:min(100%, 960px); max-height:90vh; overflow:auto; border:1px solid rgba(230,198,138,.3); border-radius:20px; padding:clamp(24px,5vw,54px); background:radial-gradient(circle at 90% 0%,rgba(106,34,162,.22),transparent 40%),#0b0711; box-shadow:0 30px 90px #000; }
