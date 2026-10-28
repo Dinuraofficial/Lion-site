@@ -13,3 +13,6 @@ Cinematic, scroll-driven 3D WebGL website for the **Leo Lions Club of Alawwa Nex
 1. Push this repository to GitHub (`main` branch).
 2. Go to **Settings → Pages**.
 3. Under **Build and deployment**, select **Deploy from a branch** → `main` / `/ (root)` and click **Save**.
+
+## Cloudflare backend (prepared, not deployed)
+A Worker + D1 backend and officer dashboard are included in `backend/` and `public/admin/`. See [backend/README.md](backend/README.md) for prerequisites, security configuration, deployment and limitations. The current GitHub Pages site continues to use the copy-and-share inquiry form until the backend is configured on Cloudflare.

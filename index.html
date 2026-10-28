@@ -1800,6 +1800,22 @@
         </div>
     </div>
 
+    <!-- Officer dashboard is opened on demand; security is enforced by the API. -->
+    <div id="officer-overlay" hidden style="position:fixed;inset:0;z-index:800;background:rgba(3,1,8,.92);padding:clamp(8px,3vw,30px);">
+      <div role="dialog" aria-modal="true" aria-label="Officer dashboard" style="position:relative;width:100%;height:100%;max-width:1200px;margin:auto;background:#0a0710;border:1px solid #6a5537;border-radius:14px;overflow:hidden;">
+        <button type="button" id="officer-close" aria-label="Close officer dashboard" style="position:absolute;z-index:2;right:12px;top:12px;width:40px;height:40px;border-radius:50%;background:#35283c;color:#fff;border:1px solid #b99a69;font-size:22px;cursor:pointer!important;">×</button>
+        <iframe id="officer-frame" title="Officer dashboard" style="border:0;width:100%;height:100%;background:#0a0710;"></iframe>
+      </div>
+    </div>
+    <button type="button" id="officer-open" aria-label="Open officer sign in" style="position:fixed;right:10px;bottom:4px;z-index:30;font:10px sans-serif;letter-spacing:.08em;color:#cbb9d0;background:rgba(0,0,0,.55);border:0;padding:6px 10px;cursor:pointer!important;">OFFICER LOGIN</button>
+    <script>
+      (function(){const overlay=document.getElementById('officer-overlay'),frame=document.getElementById('officer-frame'),open=document.getElementById('officer-open');
+      function show(){frame.src='/admin/';overlay.hidden=false;document.getElementById('officer-close').focus();}
+      function close(){overlay.hidden=true;frame.removeAttribute('src');open.focus();}
+      open.addEventListener('click',show);document.getElementById('officer-close').addEventListener('click',close);
+      window.addEventListener('keydown',e=>{if(e.ctrlKey&&e.shiftKey&&e.key.toLowerCase()==='p'){e.preventDefault();overlay.hidden?show():close();}else if(e.key==='Escape'&&!overlay.hidden)close();});})();
+    </script>
+
     <!-- WebGL Stage -->
     <canvas id="webgl"></canvas>
 
@@ -2953,5 +2969,61 @@
             }
         });
     </script>
+<script>
+// Optional Cloudflare backend. The original copy-and-share form remains usable elsewhere.
+(async function () {
+  const showcase = document.querySelector('.showcase-panel');
+  try {
+    const response = await fetch('/api/content');
+    if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+      const {items} = await response.json();
+      if (items && items.length && showcase) {
+        const section=document.createElement('section'); section.className='showcase-grid'; section.setAttribute('aria-label','Club updates');
+        for (const item of items) {
+          const card=document.createElement('article'); card.className='showcase-card';
+          const label=document.createElement('span'); label.textContent=({leader:'LEADERSHIP',project:'PROJECT',link:'CONNECT'})[item.kind] || 'CLUB';
+          const title=document.createElement('h3'); title.textContent=item.title;
+          const detail=document.createElement('p'); detail.textContent=item.detail;
+          card.append(label,title,detail);
+          if (item.url) { try { const u=new URL(item.url); if(u.protocol==='https:') { const a=document.createElement('a'); a.href=u.href; a.textContent='Learn more ↗'; a.target='_blank'; a.rel='noopener noreferrer'; a.style.color='#e6c68a'; card.append(a); } } catch (_) {} }
+          section.append(card);
+        }
+        const note = showcase.querySelector('.showcase-note');
+        showcase.insertBefore(section,note);
+        if (note) note.hidden = true;
+      }
+    }
+  } catch (_) { /* A static deployment can still show the existing showcase. */ }
+  try {
+    const response=await fetch('/api/config');
+    if(!response.ok || !response.headers.get('content-type')?.includes('application/json')) return;
+    const {turnstileSiteKey}=await response.json(); if(!turnstileSiteKey || turnstileSiteKey.startsWith('REPLACE_')) return;
+    const form=document.querySelector('#nexus-inquiry-form'), row=form.querySelector('.form-submit-row');
+    const holder=document.createElement('div'); holder.className='form-group full';
+    const widget=document.createElement('div'); holder.append(widget); row.before(holder);
+    const status=document.createElement('p'); status.setAttribute('role','status'); status.className='form-note'; holder.append(status);
+    row.querySelector('.form-note').textContent='Your inquiry will be securely sent to the club. Do not include sensitive personal information.';
+    row.querySelector('button').textContent='Send inquiry →';
+    const script=document.createElement('script'); script.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'; script.async=true; script.defer=true;
+    let widgetId; script.onload=()=>{widgetId=window.turnstile.render(widget,{sitekey:turnstileSiteKey});};
+    script.onerror=()=>{status.textContent='Verification could not load. Please try again later.';}; document.head.append(script);
+    form.addEventListener('submit',async function(e) {
+      e.preventDefault(); e.stopImmediatePropagation();
+      const token=widgetId!==undefined ? window.turnstile.getResponse(widgetId):'';
+      if(!token){status.textContent='Please complete the security check first.';return;}
+      const button=row.querySelector('button');button.disabled=true;status.textContent='Sending…';
+      try {
+        const payload={category:document.querySelector('.modal-tab.active')?.dataset.tab || 'member',name:document.querySelector('#f-name').value,contact:document.querySelector('#f-contact').value,pathway:document.querySelector('#f-pathway').value,avenue:document.querySelector('#f-avenue').value,message:document.querySelector('#f-message').value,turnstileToken:token};
+        const r=await fetch('/api/inquiries',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});
+        if(!r.ok) throw Error('Unable to send. Please try again.');
+        form.style.display='none'; document.querySelector('#form-success-box h4').textContent='Inquiry sent';
+        document.querySelector('#form-success-msg').textContent='Thank you. Your inquiry has been saved for the club officers to review.';
+        document.querySelector('#prepared-message').style.display='none'; document.querySelector('#copy-message').style.display='none'; document.querySelector('#copy-status').style.display='none'; document.querySelector('#form-success-box').classList.add('visible'); form.reset(); status.textContent='';
+      } catch(err) {status.textContent=err.message || 'Unable to send. Please try again.';}
+      finally {button.disabled=false;if(widgetId!==undefined)window.turnstile.reset(widgetId);}
+    },true);
+  } catch (_) { /* Keep the current copy-and-share form if backend is not configured. */ }
+})();
+</script>
 </body>
 </html>

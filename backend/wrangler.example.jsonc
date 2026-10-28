@@ -1,0 +1,12 @@
+{
+  "name": "lion-site",
+  "main": "backend/worker.mjs",
+  "compatibility_date": "2026-10-28",
+  "assets": { "directory": "./build", "binding": "ASSETS", "run_worker_first": ["/api/*"] },
+  "d1_databases": [{ "binding": "DB", "database_name": "nexus-db", "database_id": "d5dec9c3-248d-4a1a-a092-08fef6b32a15" }],
+  "vars": {
+    "FIREBASE_PROJECT_ID": "alawwa-nexus-admin",
+    "ADMIN_UIDS": "sTEpYyLaDbZwZdpDuHjGJLoxMKH2",
+    "TURNSTILE_SITE_KEY": "0x4AAAAAAFpOx-E8dY6-D7vT"
+  }
+}
