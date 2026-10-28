@@ -1546,6 +1546,30 @@
         @media(max-width:768px) { .showcase-backdrop { align-items:flex-end; padding:0; } .showcase-panel { border-radius:20px 20px 0 0; max-height:90dvh; padding:28px 22px calc(28px + env(safe-area-inset-bottom)); } .showcase-grid { grid-template-columns:1fr; gap:8px; } .showcase-card { padding:15px; } .showcase-card h3 { margin:8px 0 4px; font-size:19px; } .showcase-link { margin-top:10px; } }
         @media(prefers-reduced-motion:reduce) { .arrival { animation-duration:.01ms; animation-delay:0s; } *, *::before, *::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }
 
+
+        /* Local contrast shields keep animated highlights behind, not through, the copy. */
+        .slide { isolation: isolate; }
+        .slide::before {
+            content: ''; position: absolute; z-index: -1; pointer-events: none;
+            inset: -26px -30px -26px -30px;
+            background: radial-gradient(ellipse at 46% 54%, rgba(7, 4, 14, .94) 0%, rgba(7, 4, 14, .87) 58%, rgba(7, 4, 14, .15) 100%);
+            border-radius: 28px; opacity: 0; transition: opacity .35s ease;
+        }
+        .slide.active::before { opacity: 1; }
+        .slide-title, .slide-desc, .slide-eyebrow, #showcase-open {
+            text-shadow: 0 2px 6px rgba(0,0,0,.95), 0 0 18px rgba(0,0,0,.9);
+        }
+        .slide-desc { color: #f3edf6; font-weight: 400; }
+        @media (min-width: 769px) {
+            #slide-1::before { right: 46%; }
+            #slide-2::before { left: 22%; right: 18%; }
+            #slide-3::before { right: -14vw; }
+            #slide-3 .slide-title { font-size: clamp(48px, 5.3vw, 82px); white-space: normal; }
+        }
+        @media (max-width: 768px) {
+            .slide::before { inset: -18px -20px -15px; background: linear-gradient(180deg, rgba(7,4,14,.62), rgba(7,4,14,.94) 28%, rgba(7,4,14,.96)); }
+        }
+
     </style>
 
     <script type="importmap">
