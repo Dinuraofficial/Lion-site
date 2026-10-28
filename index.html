@@ -36,7 +36,7 @@
         }
 
         body {
-            min-height: 900vh;
+            min-height: 650vh;
             font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             color: #ffffff;
             overflow-x: hidden;
@@ -1514,6 +1514,35 @@
                 display: none !important;
             }
         }
+
+        /* Arrival and showcase: lightweight, accessible, no extra dependencies. */
+        .arrival { position:fixed; inset:0; z-index:900; display:grid; place-items:center; pointer-events:none; background:radial-gradient(circle at 50% 44%, #241038, #08050e 55%, #030205); animation:arrival-out .7s ease 1.2s forwards; }
+        .arrival-inner { text-align:center; animation:arrival-rise 1s ease both; }
+        .arrival img { width:100px; height:100px; object-fit:contain; filter:drop-shadow(0 0 28px rgba(218,174,100,.35)); }
+        .arrival p { color:#e6c68a; font-size:10px; letter-spacing:.34em; text-transform:uppercase; margin-top:18px; }
+        @keyframes arrival-out { to { opacity:0; visibility:hidden; } }
+        @keyframes arrival-rise { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+        .showcase-link { display:inline-flex; align-items:center; gap:12px; margin-top:20px; padding:11px 0; border:0; border-bottom:1px solid rgba(230,198,138,.6); color:#f5ddad; background:none; font:500 11px 'Outfit',sans-serif; letter-spacing:.16em; text-transform:uppercase; }
+        .showcase-link:hover { color:white; border-color:white; }
+        .showcase-backdrop { position:fixed; inset:0; z-index:550; display:flex; justify-content:center; align-items:center; padding:24px; background:rgba(3,1,8,.84); backdrop-filter:blur(18px); }
+        .showcase-backdrop[hidden] { display:none; }
+        .showcase-panel { position:relative; width:min(100%, 960px); max-height:90vh; overflow:auto; border:1px solid rgba(230,198,138,.3); border-radius:20px; padding:clamp(24px,5vw,54px); background:radial-gradient(circle at 90% 0%,rgba(106,34,162,.22),transparent 40%),#0b0711; box-shadow:0 30px 90px #000; }
+        .showcase-kicker { color:#d7b77d; font-size:10px; letter-spacing:.24em; text-transform:uppercase; }
+        .showcase-panel h2 { font-family:'Playfair Display',serif; font-weight:400; font-size:clamp(32px,5vw,54px); line-height:1.05; margin:16px 48px 16px 0; }
+        .showcase-intro { color:#d3cbd8; max-width:650px; line-height:1.7; font-size:14px; }
+        .showcase-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:28px 0; }
+        .showcase-card { border:1px solid rgba(230,198,138,.16); border-radius:12px; padding:22px; background:rgba(255,255,255,.025); }
+        .showcase-card span { color:#ccaa72; font-size:10px; letter-spacing:.16em; }
+        .showcase-card h3 { font-family:'Playfair Display',serif; font-size:21px; font-weight:400; margin:18px 0 9px; }
+        .showcase-card p, .showcase-note { color:#c9c0ce; line-height:1.65; font-size:13px; }
+        .showcase-note { padding:16px; border-left:2px solid #bd9760; background:rgba(230,198,138,.05); }
+        .showcase-panel .modal-close { top:20px; right:20px; }
+        .form-note { user-select:text; }
+        input, textarea { user-select:text; }
+        :focus-visible { outline:2px solid #e6c68a !important; outline-offset:3px; }
+        @media(max-width:768px) { .showcase-backdrop { align-items:flex-end; padding:0; } .showcase-panel { border-radius:20px 20px 0 0; max-height:90dvh; padding:28px 22px calc(28px + env(safe-area-inset-bottom)); } .showcase-grid { grid-template-columns:1fr; gap:8px; } .showcase-card { padding:15px; } .showcase-card h3 { margin:8px 0 4px; font-size:19px; } .showcase-link { margin-top:10px; } }
+        @media(prefers-reduced-motion:reduce) { .arrival { animation-duration:.01ms; animation-delay:0s; } *, *::before, *::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }
+
     </style>
 
     <script type="importmap">
@@ -1526,6 +1555,7 @@
     </script>
 </head>
 <body>
+    <div class="arrival" aria-hidden="true"><div class="arrival-inner"><img data-club-emblem alt=""><p>Leadership &bull; Fellowship &bull; Service</p></div></div>
     <!-- Custom Double-Ring Cursor -->
     <div class="cursor-inner"></div>
     <div class="cursor-outer"></div>
@@ -1598,6 +1628,7 @@
                 <span class="cause-tag interactive-el" data-open-modal="project" data-cause="Hunger Relief">Hunger Relief</span>
                 <span class="cause-tag interactive-el" data-open-modal="project" data-cause="Health & Wellness">Community Health</span>
             </div>
+            <button type="button" class="showcase-link interactive-el" id="showcase-open">Explore our club <span aria-hidden="true">↗</span></button>
         </section>
 
         <!-- Slide 4: Join the Nexus -->
@@ -1658,6 +1689,22 @@
                 <div class="story-dash"><div class="story-dash-fill" id="dash-fill-4"></div></div>
             </div>
         </div>
+    </div>
+
+    <div class="showcase-backdrop" id="showcase-backdrop" hidden>
+        <section class="showcase-panel" role="dialog" aria-modal="true" aria-labelledby="showcase-title">
+            <button type="button" class="modal-close interactive-el" id="showcase-close" aria-label="Close club showcase">&times;</button>
+            <p class="showcase-kicker">Alawwa Nexus &nbsp; / &nbsp; District 306 D11</p>
+            <h2 id="showcase-title">Together, we serve.</h2>
+            <p class="showcase-intro">A meeting point for leadership, friendship and service in Alawwa. Explore the causes that bring us together—and imagine what we can build next.</p>
+            <div class="showcase-grid">
+                <article class="showcase-card"><span>01 / PEOPLE</span><h3>Leadership &amp; fellowship</h3><p>A community of people ready to learn, lead and serve alongside one another.</p></article>
+                <article class="showcase-card"><span>02 / PURPOSE</span><h3>Service in action</h3><p>From youth empowerment to vision, environment, hunger and community health—every act of service starts with listening.</p></article>
+                <article class="showcase-card"><span>03 / POSSIBILITY</span><h3>Partner with us</h3><p>Have an idea or a community need? Start a conversation about volunteering or working together.</p></article>
+            </div>
+            <p class="showcase-note">Club leadership, project stories and official social links can be added once the club provides the details.</p>
+            <button type="button" class="showcase-link interactive-el" id="showcase-contact">Start a conversation <span aria-hidden="true">↗</span></button>
+        </section>
     </div>
 
     <!-- Interactive Club Membership & Project Partnership Modal -->
@@ -1728,14 +1775,14 @@
                     <textarea id="f-message" rows="3" class="interactive-el" placeholder="Share your background, passion for leadership, or community initiative in Alawwa / District 306 D11..."></textarea>
                 </div>
                 <div class="form-submit-row">
-                    <span class="form-note">Secretariat &bull; Leo Lions Club of Alawwa Nexus, Alawwa, Sri Lanka</span>
-                    <button type="submit" class="cta-primary interactive-el">Transmit to Secretariat &rarr;</button>
+                    <span class="form-note">No delivery service is connected yet. Prepare a message to copy and share with the club.</span>
+                    <button type="submit" class="cta-primary interactive-el">Prepare message &rarr;</button>
                 </div>
             </form>
 
             <div class="form-success" id="form-success-box">
-                <h4>Message Received in Fellowship</h4>
-                <p id="form-success-msg">Thank you for stepping forward. The Club Secretariat of Leo Lions Club of Alawwa Nexus (District 306 D11) will connect with you shortly. Together, We Serve.</p>
+                <h4>Your message is ready</h4>
+                <p id="form-success-msg"></p><textarea id="prepared-message" rows="7" aria-label="Prepared inquiry" style="width:100%; margin-top:16px; padding:12px; color:white; background:#171020; border:1px solid #806c50; border-radius:8px; user-select:text;"></textarea><button type="button" id="copy-message" class="showcase-link">Copy message</button><p id="copy-status" role="status">Copy this message and send it to the club using a verified contact channel. It has not been sent automatically.</p>
             </div>
         </div>
     </div>
@@ -1940,17 +1987,16 @@
                 return val >= start && val <= end;
             }
 
-            if (slide1) slide1.classList.toggle('active', isActive(scroll, -0.10, 0.12));
+            const chapterIdx = scroll < 0.21 ? 0 : scroll < 0.48 ? 1 : scroll < 0.76 ? 2 : 3;
+            if (slide1) slide1.classList.toggle('active', chapterIdx === 0);
             if (slide2) {
-                const active2 = isActive(scroll, 0.28, 0.40);
+                const active2 = chapterIdx === 1;
                 slide2.classList.toggle('active', active2);
                 const slide2Img = document.getElementById('slide-2-img');
                 if (slide2Img) slide2Img.classList.toggle('active', active2);
             }
-            if (slide3) slide3.classList.toggle('active', isActive(scroll, 0.56, 0.68));
-            if (slide4) slide4.classList.toggle('active', isActive(scroll, 0.84, 1.05));
-
-            const chapterIdx = Math.min(3, Math.max(0, Math.floor(scroll * 3.99)));
+            if (slide3) slide3.classList.toggle('active', chapterIdx === 2);
+            if (slide4) slide4.classList.toggle('active', chapterIdx === 3);
             const hudLabel = document.getElementById('hud-chapter-label');
             if (hudLabel) hudLabel.textContent = CHAPTER_LABELS[chapterIdx];
 
@@ -2084,17 +2130,32 @@
                 if (e.key === 'Escape' && backdrop.classList.contains('open')) closeModal();
             });
 
-            if (form) {
-                form.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    const name = document.getElementById('f-name').value.trim() || 'Friend';
-                    const avenue = avenueSelect.value;
-                    form.style.display = 'none';
-                    document.getElementById('form-success-msg').textContent =
-                        `Thank you, ${name}. Your inquiry regarding "${avenue}" has been logged for the Leo Lions Club of Alawwa Nexus Secretariat (Lions District 306 D11). Together, We Serve.`;
-                    successBox.classList.add('visible');
-                });
-            }
+            const prepared = document.getElementById('prepared-message');
+            const copyStatus = document.getElementById('copy-status');
+            if (form) form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const mode = document.querySelector('.modal-tab.active')?.textContent.trim() || 'Inquiry';
+                prepared.value = `${mode} — Leo Lions Club of Alawwa Nexus\n\nName: ${document.getElementById('f-name').value.trim()}\nContact: ${document.getElementById('f-contact').value.trim()}\nInterest: ${pathwaySelect.value}\nService avenue: ${avenueSelect.value}\n\n${document.getElementById('f-message').value.trim()}`;
+                form.style.display = 'none';
+                document.getElementById('form-success-msg').textContent = 'Your inquiry has not been sent. Copy it below and share it through a verified club contact.';
+                copyStatus.textContent = 'Copy this message and send it to the club using a verified contact channel.';
+                successBox.classList.add('visible');
+            });
+            document.getElementById('copy-message').addEventListener('click', async () => {
+                try { await navigator.clipboard.writeText(prepared.value); copyStatus.textContent = 'Copied. Please send it to the club through a verified contact channel.'; }
+                catch (_) { prepared.focus(); prepared.select(); copyStatus.textContent = 'Select and copy the message above, then share it with the club.'; }
+            });
+
+            const showcase = document.getElementById('showcase-backdrop');
+            const showcaseOpen = document.getElementById('showcase-open');
+            const showcaseClose = document.getElementById('showcase-close');
+            function closeShowcase() { showcase.hidden = true; showcaseOpen.focus(); }
+            showcaseOpen.addEventListener('click', () => { showcase.hidden = false; showcaseClose.focus(); });
+            showcaseClose.addEventListener('click', closeShowcase);
+            showcase.addEventListener('click', (e) => { if (e.target === showcase) closeShowcase(); });
+            window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !showcase.hidden) closeShowcase(); });
+            document.getElementById('showcase-contact').addEventListener('click', () => { showcase.hidden = true; openModal('project'); closeBtn.focus(); });
+
         }
 
         // Pointer Tracking (PC Mouse + Passive Mobile Touch-Glide Tilt)
@@ -2130,7 +2191,7 @@
                 : (window.pageYOffset !== undefined ? window.pageYOffset : document.documentElement.scrollTop);
             const targetScroll = maxScroll > 0 ? scrollTop / maxScroll : 0;
 
-            currentScroll += (targetScroll - currentScroll) * 0.025;
+            currentScroll += (targetScroll - currentScroll) * (window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 0.065);
 
             mouseX += (targetMouseX - mouseX) * 0.05;
             mouseY += (targetMouseY - mouseY) * 0.05;
