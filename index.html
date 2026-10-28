@@ -1552,8 +1552,10 @@
         .slide::before {
             content: ''; position: absolute; z-index: -1; pointer-events: none;
             inset: -26px -30px -26px -30px;
-            background: radial-gradient(ellipse at 46% 54%, rgba(7, 4, 14, .94) 0%, rgba(7, 4, 14, .87) 58%, rgba(7, 4, 14, .15) 100%);
-            border-radius: 28px; opacity: 0; transition: opacity .35s ease;
+            background: rgba(8, 5, 15, .97);
+            border: 1px solid rgba(230, 198, 138, .14);
+            box-shadow: 0 16px 50px rgba(0, 0, 0, .48);
+            border-radius: 18px; opacity: 0; transition: opacity .35s ease;
         }
         .slide.active::before { opacity: 1; }
         .slide-title, .slide-desc, .slide-eyebrow, #showcase-open {
@@ -1563,11 +1565,11 @@
         @media (min-width: 769px) {
             #slide-1::before { right: 46%; }
             #slide-2::before { left: 22%; right: 18%; }
-            #slide-3::before { right: -14vw; }
+            #slide-3::before { right: -25px; }
             #slide-3 .slide-title { font-size: clamp(48px, 5.3vw, 82px); white-space: normal; }
         }
         @media (max-width: 768px) {
-            .slide::before { inset: -18px -20px -15px; background: linear-gradient(180deg, rgba(7,4,14,.62), rgba(7,4,14,.94) 28%, rgba(7,4,14,.96)); }
+            .slide::before { inset: -14px -12px -10px; background: rgba(8, 5, 15, .97); }
         }
 
     </style>
