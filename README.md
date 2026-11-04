@@ -11,7 +11,7 @@ A cinematic, scroll-driven website for the **Leo Lions Club of Alawwa Nexus**, D
 - Scroll-driven 3D monument, animated background and mobile-friendly chapter navigation.
 - Membership and partnership inquiry forms, plus a showcase for published club leaders, projects and links.
 - An optional **crawler** that an authorized officer can enable or disable site-wide. It is off until enabled. When enabled, three smaller spiders hatch automatically at random intervals and grow while remaining smaller than the parent.
-- A draggable, fading crawler settings button lets visitors change color, behavior, size, trails, sound and whether the babies follow. These preferences are local to the visitor's browser; visitors cannot change the site-wide switch. The crawler does not run when the browser requests reduced motion.
+- A draggable, fading crawler settings button lets visitors change color, behavior, size, word highlights, trails, sound and whether the babies follow. Feet briefly highlight the active chapter text when they land on it. These preferences are local to the visitor's browser; visitors cannot change the site-wide switch. The crawler does not run when the browser requests reduced motion.
 
 ## Officer dashboard
 
