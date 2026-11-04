@@ -1,6 +1,6 @@
-# Cloudflare + Firebase backend — staging setup
+# Cloudflare + Firebase backend — setup and maintenance
 
-The existing website remains live; this implementation is prepared locally and is not deployed. Cloudflare Worker serves the static site and D1. Firebase Authentication signs in the officers. The Worker independently verifies signed Firebase ID tokens using Google's public keys and allows only explicitly configured UIDs. The login screen is public; private data is not. The dashboard uses short-lived tokens only in memory and requires sign-in again when a token expires. It does not currently check Firebase revocation or disabled-user status before token expiry. Remove an officer UID from ADMIN_UIDS and redeploy to revoke access immediately.
+The production website is configured to deploy from GitHub to Cloudflare Workers. Check the Cloudflare build status and runtime bindings after each deployment. The Worker serves the static site and D1. Firebase Authentication signs in the officers. The Worker independently verifies signed Firebase ID tokens using Google's public keys and allows only explicitly configured UIDs. The login screen is public; private data is not. The dashboard uses short-lived tokens only in memory and requires sign-in again when a token expires. It does not currently check Firebase revocation or disabled-user status before token expiry. Remove an officer UID from ADMIN_UIDS and redeploy to revoke access immediately.
 
 ## Security and deployment prerequisites
 
@@ -12,3 +12,7 @@ The existing website remains live; this implementation is prepared locally and i
 6. Define a privacy notice and retention/deletion policy. Inquiries are sensitive. The dashboard displays the latest 200; delete requests permanently. No email alerts, direct image uploads or photos in the dashboard are implemented; HTTPS links may be entered instead. Published entries appear in the website showcase; drafts are admin-only. D1 is not backed up by this implementation; set up backups.
 
 Turnstile site key is public; secret is private. Firebase Web API key is public application config and not an admin credential. Restrict its use in Google Cloud as appropriate without blocking Firebase Auth, monitor quotas and don't rely on hiding the key. Worker routes `/api/*` require `run_worker_first`; it serves `build/` through the ASSETS binding. The admin overlay supports Ctrl+Shift+P where the browser allows it and an Officer Login button as fallback. Closing it clears the in-memory session by unloading the frame.
+
+## Crawler administration
+
+The site-wide crawler switch defaults to off. Approved officers can toggle it in the dashboard. The setting is stored as a reserved, unpublished record in the existing `content` table, so no additional database migration is needed. The public `GET /api/crawler` returns only the enabled state; changing it requires a verified officer token and a same-origin request to `/api/admin/crawler`. Public pages poll for changes approximately every 30 seconds and also check on page load. Visitor visual preferences are local to their browser. The crawler is suppressed when reduced motion is requested.

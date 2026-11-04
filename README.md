@@ -1,18 +1,40 @@
-# Leo Lions Club of Alawwa Nexus — Official Website
+# Leo Lions Club of Alawwa Nexus
 
-Cinematic, scroll-driven 3D WebGL website for the **Leo Lions Club of Alawwa Nexus** (*Lions International District 306 D11 · Multiple District 306 Sri Lanka*).
+A cinematic, scroll-driven website for the **Leo Lions Club of Alawwa Nexus**, District 306 D11, with a Cloudflare-powered club dashboard.
 
-## Features
-- **Single Self-Contained `index.html`**: Zero build step, no bundler required, all club emblems and editorial visuals embedded directly as optimized WebP data URIs.
-- **3D WebGL "Sovereign Nexus" Monument (`Three.js r0.160`)**: Parametric 3-lobed champagne-bronze Triquetra interwoven in 3D space with a Royal Amethyst circle, floating faceted crystals, celestial astrolabe rings, and a double-sided relief-mapped Alawwa Nexus emblem seal.
-- **Scroll-Driven 360° Camera Orbit & GLSL Liquid Silk Shader**: Morphs smoothly from Royal Amethyst & Sovereign Gold to Imperial Violet and Lions International Sapphire Blue across `650vh`.
-- **Inquiry builder and club showcase**: Explore the club’s service themes and prepare a membership or partnership message. The site does not send inquiries; add a verified contact channel or backend before accepting submissions. The showcase intentionally omits unverified leadership names, project results and social links.
-- **Responsive navigation**: Dedicated mobile framing and chapter controls, shortened scroll distance, reduced-motion styling, and a brief crest arrival.
+- **Website:** [lion-site.smartstack-ai-2026.workers.dev](https://lion-site.smartstack-ai-2026.workers.dev/)
+- **Repository:** [Dinuraofficial/Lion-site](https://github.com/Dinuraofficial/Lion-site)
+- **Restore point before the crawler:** [`restore-before-crawler-20261104`](https://github.com/Dinuraofficial/Lion-site/tree/restore-before-crawler-20261104)
 
-## Live Deployment (GitHub Pages)
-1. Push this repository to GitHub (`main` branch).
-2. Go to **Settings → Pages**.
-3. Under **Build and deployment**, select **Deploy from a branch** → `main` / `/ (root)` and click **Save**.
+## Website features
 
-## Cloudflare backend (prepared, not deployed)
-A Worker + D1 backend and officer dashboard are included in `backend/` and `public/admin/`. See [backend/README.md](backend/README.md) for prerequisites, security configuration, deployment and limitations. The current GitHub Pages site continues to use the copy-and-share inquiry form until the backend is configured on Cloudflare.
+- Scroll-driven 3D monument, animated background and mobile-friendly chapter navigation.
+- Membership and partnership inquiry forms, plus a showcase for published club leaders, projects and links.
+- An optional **crawler** that an authorized officer can enable or disable site-wide. It is off until enabled. When enabled, three smaller spiders hatch automatically at random intervals and grow while remaining smaller than the parent.
+- A draggable, fading crawler settings button lets visitors change color, behavior, size, trails, sound and whether the babies follow. These preferences are local to the visitor's browser; visitors cannot change the site-wide switch. The crawler does not run when the browser requests reduced motion.
+
+## Officer dashboard
+
+Use **Officer Login** on the website, or `Ctrl + Shift + P` where supported by the browser. Sign in with the email and password of an authorized Firebase user. Officers can manage inquiries, publish club content and use **Website crawler** to change the site-wide setting. The on/off setting is stored in D1; open pages check periodically (about every 30 seconds) or can be reloaded.
+
+The Worker verifies Firebase ID tokens and an explicit UID allowlist for admin API requests. The shortcut and public login screen are not security controls. Keep officer passwords and service-account credentials private. See [backend/README.md](backend/README.md) for security and setup details.
+
+## Technology and deployment
+
+The Cloudflare deployment uses:
+
+- `index.html` — main site and embedded club imagery.
+- `public/crawler-overlay.js` — optional crawler overlay.
+- `public/admin/index.html` — officer dashboard.
+- `backend/worker.mjs` — Worker API and authorization.
+- Cloudflare D1 — inquiries, club content and crawler setting.
+- Firebase Authentication — officer sign-in.
+- Cloudflare Turnstile — inquiry spam verification.
+
+Cloudflare Workers Builds is connected to the `main` branch. The build command is `node backend/build.mjs`, and the deploy command is `npx wrangler deploy`. The build produces `build/` from the site and public assets; `wrangler.jsonc` defines Worker and D1 bindings. Before changing deployment settings, check the existing Cloudflare configuration and test in staging.
+
+The inquiry form sends to D1 only when Turnstile is configured correctly, including the `TURNSTILE_SECRET_KEY` **runtime secret**. Otherwise it retains the copy-and-share fallback. No email notifications or image uploads are implemented. A plain static deployment such as GitHub Pages does not run the Worker API or officer dashboard.
+
+## Restore
+
+The tag above points to the GitHub version immediately before the crawler update. To undo the crawler commit while preserving later history, an authorized maintainer can revert commit `a24a931` through GitHub or Git. Review later changes and deployment settings before restoring; a Git restore does **not** restore D1 database data. Maintain separate D1 backups.
