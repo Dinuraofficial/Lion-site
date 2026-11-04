@@ -41,6 +41,10 @@ export default {async fetch(req,env) {
  if(!path.startsWith('/api/')) return env.ASSETS.fetch(req);
  try {
   if(path==='/api/config' && method==='GET') return json({turnstileSiteKey:env.TURNSTILE_SECRET_KEY ? (env.TURNSTILE_SITE_KEY || '') : ''});
+  if(path==='/api/crawler' && method==='GET') {
+   const row=await env.DB.prepare("SELECT detail FROM content WHERE id='__site_crawler_setting__' AND kind='link' AND published=0").first();
+   return json({enabled:row?.detail==='enabled'});
+  }
   if(path==='/api/content' && method==='GET') {
    const {results}=await env.DB.prepare('SELECT id,kind,title,detail,url FROM content WHERE published=1 ORDER BY updated_at DESC LIMIT 100').all(); return json({items:results});
   }
@@ -55,11 +59,21 @@ export default {async fetch(req,env) {
   if(path.startsWith('/api/admin/')) {
    if(!await authorized(req,env)) return json({error:'Unauthorized'},401);
    if(!['GET','HEAD'].includes(method) && req.headers.get('origin')!==url.origin) return json({error:'Invalid origin'},403);
+   if(path==='/api/admin/crawler' && method==='PUT') {
+    const d=await body(req); if(typeof d.enabled!=='boolean') throw Error('Invalid setting');
+    const now=new Date().toISOString();
+    await env.DB.prepare("INSERT INTO content (id,kind,title,detail,url,published,created_at,updated_at) VALUES ('__site_crawler_setting__','link','Crawler setting',?,'',0,?,?) ON CONFLICT(id) DO UPDATE SET detail=excluded.detail,updated_at=excluded.updated_at").bind(d.enabled?'enabled':'disabled',now,now).run();
+    return json({enabled:d.enabled});
+   }
+   if(path==='/api/admin/crawler' && method==='GET') {
+    const row=await env.DB.prepare("SELECT detail FROM content WHERE id='__site_crawler_setting__' AND kind='link' AND published=0").first();
+    return json({enabled:row?.detail==='enabled'});
+   }
    if(path==='/api/admin/inquiries' && method==='GET') { const {results}=await env.DB.prepare('SELECT * FROM inquiries ORDER BY created_at DESC LIMIT 200').all(); return json({items:results}); }
    const inquiry=path.match(/^\/api\/admin\/inquiries\/([a-f0-9-]{36})$/);
    if(inquiry && method==='DELETE') { await env.DB.prepare('DELETE FROM inquiries WHERE id=?').bind(inquiry[1]).run(); return json({ok:true}); }
    if(inquiry && method==='PATCH') { const d=await body(req); if(!['new','reviewed'].includes(d.status)) throw Error('Invalid status'); await env.DB.prepare('UPDATE inquiries SET status=? WHERE id=?').bind(d.status,inquiry[1]).run(); return json({ok:true}); }
-   if(path==='/api/admin/content' && method==='GET') { const {results}=await env.DB.prepare('SELECT * FROM content ORDER BY updated_at DESC LIMIT 200').all(); return json({items:results}); }
+   if(path==='/api/admin/content' && method==='GET') { const {results}=await env.DB.prepare("SELECT * FROM content WHERE id != '__site_crawler_setting__' ORDER BY updated_at DESC LIMIT 200").all(); return json({items:results}); }
    if(path==='/api/admin/content' && method==='POST') {
     const d=await body(req); if(!['leader','project','link'].includes(d.kind)) throw Error('Invalid kind');
     const id=crypto.randomUUID(), now=new Date().toISOString();
