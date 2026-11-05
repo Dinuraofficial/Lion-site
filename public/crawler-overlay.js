@@ -49,7 +49,7 @@ const marks=[],wordHits=[];let main=null,babies=[],silkAnchor=null;
 let lastActivity=0,web=null;
 function activity(){lastActivity=time;if(web&&web.state!=='fading'){web.state='fading';web.fade=1}if(main)main.next=0}
 function webUpdate(dt){
- if(!web&&time-lastActivity>=25){const corner=Math.floor(Math.random()*4),size=Math.min(150,w*.25,h*.25),right=corner%2,bottom=corner>=2;web={right,bottom,size,x:right?w-size*.28:size*.28,y:bottom?h-size*.28:size*.28,state:'approach',progress:0,fade:1}}
+ if(!web&&time-lastActivity>=25){const corner=Math.floor(Math.random()*4),size=Math.min(main.unit()*(24+210*Number(C.legLen.value)/100)*3.1,w*.44,h*.44),right=corner%2,bottom=corner>=2;web={right,bottom,size,x:right?w-size*.28:size*.28,y:bottom?h-size*.28:size*.28,state:'approach',progress:0,fade:1}}
  if(!web)return;
  if(web.state==='fading'){web.fade-=dt*2;if(web.fade<=0)web=null;return}
  if(web.state==='approach'&&Math.hypot(main.x-web.x,main.y-web.y)<Math.max(12,main.unit()*25))web.state='weaving';
@@ -62,7 +62,35 @@ function webUpdate(dt){
  if(web.nestStart!=null&&controls.babies.checked){for(let i=0;i<babies.length;i++)if(!web.hatched[i]&&time-web.nestStart>=6+i*2){const b=babies[i];web.hatched[i]=true;b.x=web.x+(i-1)*12;b.y=web.y+8;b.tx=b.x;b.ty=b.y;b.vx=b.vy=0;b.age=0;b.k=.16;b.build();b.solve()}}
 }
 function drawEggs(){if(!web||web.nestStart==null||!controls.babies.checked)return;const elapsed=time-web.nestStart;ctx.save();for(let i=0;i<3;i++){if(elapsed<i*.8||web.hatched[i])continue;const x=web.x+(i-1)*12,y=web.y+8,scale=clamp((elapsed-i*.8)*2,0,1);ctx.beginPath();ctx.ellipse(x,y,4*scale,5*scale,0,0,Math.PI*2);ctx.fillStyle=`rgba(250,232,190,${.85*web.fade})`;ctx.fill();ctx.strokeStyle=`rgba(255,255,255,${.6*web.fade})`;ctx.lineWidth=1;ctx.stroke()}ctx.restore()}
-function drawWeb(){if(!web||!web.progress)return;const {right,bottom,size,progress,fade}=web,cx=right?w:0,cy=bottom?h:0,sx=right?-1:1,sy=bottom?-1:1;ctx.save();ctx.strokeStyle=`rgba(225,218,210,${.5*fade})`;ctx.lineWidth=1;const steps=15,done=progress*steps;for(let i=0;i<steps;i++){const f=clamp(done-i,0,1);if(!f)break;ctx.beginPath();if(i<7){const a=i*Math.PI/12,x=cx+sx*size*Math.cos(a),y=cy+sy*size*Math.sin(a);ctx.moveTo(cx,cy);ctx.lineTo(lerp(cx,x,f),lerp(cy,y,f))}else{const radius=size*(i-6)/8;for(let j=0;j<=6;j++){const a=j*Math.PI/12,x=cx+sx*radius*Math.cos(a),y=cy+sy*radius*Math.sin(a);if(j===0)ctx.moveTo(x,y);else if(f*6>=j)ctx.lineTo(x,y);else{const a0=(j-1)*Math.PI/12,part=clamp(f*6-(j-1),0,1);ctx.lineTo(lerp(cx+sx*radius*Math.cos(a0),x,part),lerp(cy+sy*radius*Math.sin(a0),y,part));break}}}ctx.stroke()}ctx.restore()}
+function drawWeb(){
+ if(!web||!web.progress)return;
+ const {right,bottom,size,progress,fade}=web,cx=right?w:0,cy=bottom?h:0,sx=right?-1:1,sy=bottom?-1:1;
+ const spokes=13,rings=11,total=spokes+rings,done=progress*total;
+ const point=(r,a)=>[cx+sx*r*Math.cos(a),cy+sy*r*Math.sin(a)];
+ ctx.save();ctx.lineCap='round';ctx.lineWidth=Math.max(.65,Math.min(1.1,size/240));
+ // Fine radial support threads appear first, followed by individual curved silk bands.
+ for(let i=0;i<spokes;i++){
+  const f=clamp(done-i,0,1);if(!f)break;
+  const a=i*Math.PI/(2*(spokes-1)),[x,y]=point(size,a);
+  ctx.strokeStyle=`rgba(235,226,213,${(i===0||i===spokes-1?.64:.4)*fade})`;
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(lerp(cx,x,f),lerp(cy,y,f));ctx.stroke();
+ }
+ for(let ring=0;ring<rings;ring++){
+  const f=clamp(done-spokes-ring,0,1);if(!f)break;
+  const radius=size*(.13+.87*ring/(rings-1)),segments=f*(spokes-1);
+  ctx.strokeStyle=`rgba(242,235,222,${(.36+ring/rings*.12)*fade})`;
+  ctx.beginPath();const [x0,y0]=point(radius,0);ctx.moveTo(x0,y0);
+  for(let j=0;j<spokes-1&&j<segments;j++){
+   const a=j*Math.PI/(2*(spokes-1)),b=(j+1)*Math.PI/(2*(spokes-1)),part=clamp(segments-j,0,1),mid=(a+b)/2;
+   const [x,y]=point(radius,a),[ex,ey]=point(radius,b),[qx,qy]=point(radius*.92,mid);
+   // Partial quadratic Bézier keeps the weaving animation continuous.
+   const q1x=lerp(x,qx,part),q1y=lerp(y,qy,part),q2x=lerp(qx,ex,part),q2y=lerp(qy,ey,part);
+   ctx.quadraticCurveTo(q1x,q1y,lerp(q1x,q2x,part),lerp(q1y,q2y,part));
+  }ctx.stroke();
+ }
+ if(progress>.55){ctx.fillStyle=`rgba(255,246,226,${.55*fade})`;ctx.beginPath();ctx.arc(cx,cy,Math.max(1,size*.008),0,Math.PI*2);ctx.fill()}
+ ctx.restore();
+}
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rand=(a,b)=>a+Math.random()*(b-a),lerp=(a,b,t)=>a+(b-a)*t;
 function resize(){w=innerWidth;h=innerHeight;dpr=Math.min(devicePixelRatio||1,1.5);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);BASE=clamp(Math.min(w,h)/1500,.18,.38)*.8}
