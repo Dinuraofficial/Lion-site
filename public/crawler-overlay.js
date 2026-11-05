@@ -46,7 +46,7 @@ function buildRest(legMul){
 let w,h,dpr,BASE=1,time=0,last=0,raf=0,audio=null,lastTick=0,fadeTimer=0,active=true,nextHatch=0;const pointer={x:0,y:0,down:false,last:-100,seen:false};
 const marks=[],wordHits=[];let main=null,babies=[];
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rand=(a,b)=>a+Math.random()*(b-a),lerp=(a,b,t)=>a+(b-a)*t;
-function resize(){w=innerWidth;h=innerHeight;dpr=Math.min(devicePixelRatio||1,1.5);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);BASE=clamp(Math.min(w,h)/1500,.18,.38)}
+function resize(){w=innerWidth;h=innerHeight;dpr=Math.min(devicePixelRatio||1,1.5);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);BASE=clamp(Math.min(w,h)/1500,.18,.38)*.8}
 function rebuild(){if(main){main.build();main.solve()}babies.forEach(b=>{b.build();b.solve()})}
 // Measure only the active slide under a landing foot. No wrapping or mutation of the site's text.
 let lastWordCheck=-1;
