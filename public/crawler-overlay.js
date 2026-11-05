@@ -47,11 +47,11 @@ let w,h,dpr,BASE=1,time=0,last=0,raf=0,audio=null,lastTick=0,fadeTimer=0,active=
 const marks=[],wordHits=[];let main=null,babies=[],silkAnchor=null;
 // Idle web is purely visual: the canvas never intercepts site interactions.
 let lastActivity=0,web=null;
-function activity(){lastActivity=time;if(web&&web.state!=='fading'){web.state='fading';web.fade=1}if(main)main.next=0}
+function activity(){lastActivity=time;if(web&&web.state!=='fading'){web.state='fading';web.fade=1;web.fadeStart=performance.now()}if(main)main.next=0}
 function webUpdate(dt){
- if(!web&&time-lastActivity>=25){const corner=Math.floor(Math.random()*4),size=Math.min(main.unit()*(24+210*Number(C.legLen.value)/100)*3.1,w*.44,h*.44),right=corner%2,bottom=corner>=2;web={right,bottom,size,x:right?w-size*.28:size*.28,y:bottom?h-size*.28:size*.28,state:'approach',progress:0,fade:1}}
+ if(!web&&time-lastActivity>=25){const size=Math.min(w,h)*.39;web={size,x:w/2,y:h/2,state:'approach',progress:0,fade:1}}
  if(!web)return;
- if(web.state==='fading'){web.fade-=dt*2;if(web.fade<=0)web=null;return}
+ if(web.state==='fading'){web.fade=Math.max(0,1-(performance.now()-web.fadeStart)/10000);if(web.fade<=0)web=null;return}
  if(web.state==='approach'&&Math.hypot(main.x-web.x,main.y-web.y)<Math.max(12,main.unit()*25))web.state='weaving';
  if(web.state==='weaving')web.progress=Math.min(1,web.progress+dt/12);
  // Wait for the web to finish and for 100 seconds of inactivity. Reuse the
@@ -64,31 +64,37 @@ function webUpdate(dt){
 function drawEggs(){if(!web||web.nestStart==null||!controls.babies.checked)return;const elapsed=time-web.nestStart;ctx.save();for(let i=0;i<3;i++){if(elapsed<i*.8||web.hatched[i])continue;const x=web.x+(i-1)*12,y=web.y+8,scale=clamp((elapsed-i*.8)*2,0,1);ctx.beginPath();ctx.ellipse(x,y,4*scale,5*scale,0,0,Math.PI*2);ctx.fillStyle=`rgba(250,232,190,${.85*web.fade})`;ctx.fill();ctx.strokeStyle=`rgba(255,255,255,${.6*web.fade})`;ctx.lineWidth=1;ctx.stroke()}ctx.restore()}
 function drawWeb(){
  if(!web||!web.progress)return;
- const {right,bottom,size,progress,fade}=web,cx=right?w:0,cy=bottom?h:0,sx=right?-1:1,sy=bottom?-1:1;
- const spokes=13,rings=11,total=spokes+rings,done=progress*total;
- const point=(r,a)=>[cx+sx*r*Math.cos(a),cy+sy*r*Math.sin(a)];
- ctx.save();ctx.lineCap='round';ctx.lineWidth=Math.max(.65,Math.min(1.1,size/240));
- // Fine radial support threads appear first, followed by individual curved silk bands.
- for(let i=0;i<spokes;i++){
+ const {x:cx,y:cy,size,progress,fade}=web,spokes=20,rings=13,supports=8;
+ const total=supports+spokes+rings,done=progress*total;
+ const point=(r,a)=>[cx+r*Math.cos(a),cy+r*Math.sin(a)];
+ ctx.save();ctx.lineCap='round';ctx.lineWidth=Math.max(.7,Math.min(1.25,size/250));
+ // Long anchor threads tie the orb to the edges of the viewport.
+ for(let i=0;i<supports;i++){
   const f=clamp(done-i,0,1);if(!f)break;
-  const a=i*Math.PI/(2*(spokes-1)),[x,y]=point(size,a);
-  ctx.strokeStyle=`rgba(235,226,213,${(i===0||i===spokes-1?.64:.4)*fade})`;
-  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(lerp(cx,x,f),lerp(cy,y,f));ctx.stroke();
+  const a=i*Math.PI*2/supports,dx=Math.cos(a),dy=Math.sin(a);
+  const edge=Math.min(Math.abs(dx)>1e-6?(w/2-4)/Math.abs(dx):Infinity,Math.abs(dy)>1e-6?(h/2-4)/Math.abs(dy):Infinity);
+  const [x,y]=point(size,a),[ex,ey]=point(edge,a);
+  ctx.strokeStyle=`rgba(243,231,214,${.58*fade})`;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(lerp(x,ex,f),lerp(y,ey,f));ctx.stroke();
+ }
+ // Radial spokes and many slightly sagging spiral-like capture strands.
+ for(let i=0;i<spokes;i++){
+  const f=clamp(done-supports-i,0,1);if(!f)break;
+  const [x,y]=point(size,i*Math.PI*2/spokes);
+  ctx.strokeStyle=`rgba(244,236,223,${.48*fade})`;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(lerp(cx,x,f),lerp(cy,y,f));ctx.stroke();
  }
  for(let ring=0;ring<rings;ring++){
-  const f=clamp(done-spokes-ring,0,1);if(!f)break;
-  const radius=size*(.13+.87*ring/(rings-1)),segments=f*(spokes-1);
-  ctx.strokeStyle=`rgba(242,235,222,${(.36+ring/rings*.12)*fade})`;
+  const f=clamp(done-supports-spokes-ring,0,1);if(!f)break;
+  const radius=size*(.12+.88*ring/(rings-1)),segments=f*spokes;
+  ctx.strokeStyle=`rgba(250,241,226,${(.45+ring/rings*.1)*fade})`;
   ctx.beginPath();const [x0,y0]=point(radius,0);ctx.moveTo(x0,y0);
-  for(let j=0;j<spokes-1&&j<segments;j++){
-   const a=j*Math.PI/(2*(spokes-1)),b=(j+1)*Math.PI/(2*(spokes-1)),part=clamp(segments-j,0,1),mid=(a+b)/2;
-   const [x,y]=point(radius,a),[ex,ey]=point(radius,b),[qx,qy]=point(radius*.92,mid);
-   // Partial quadratic Bézier keeps the weaving animation continuous.
+  for(let j=0;j<spokes&&j<segments;j++){
+   const a=j*Math.PI*2/spokes,b=(j+1)*Math.PI*2/spokes,part=clamp(segments-j,0,1),mid=(a+b)/2;
+   const [x,y]=point(radius,a),[ex,ey]=point(radius,b),[qx,qy]=point(radius*.94,mid);
    const q1x=lerp(x,qx,part),q1y=lerp(y,qy,part),q2x=lerp(qx,ex,part),q2y=lerp(qy,ey,part);
    ctx.quadraticCurveTo(q1x,q1y,lerp(q1x,q2x,part),lerp(q1y,q2y,part));
   }ctx.stroke();
  }
- if(progress>.55){ctx.fillStyle=`rgba(255,246,226,${.55*fade})`;ctx.beginPath();ctx.arc(cx,cy,Math.max(1,size*.008),0,Math.PI*2);ctx.fill()}
+ if(progress>.65){ctx.fillStyle=`rgba(255,246,226,${.7*fade})`;ctx.beginPath();ctx.arc(cx,cy,Math.max(1.5,size*.009),0,Math.PI*2);ctx.fill()}
  ctx.restore();
 }
 
@@ -134,7 +140,7 @@ class Spider{
       if(this.baby){
         if(C.babyFollow.checked&&leader){const c=Math.cos(leader.a),s=Math.sin(leader.a);this.tx=leader.x-c*this.oy+(-s)*this.ox;this.ty=leader.y-s*this.oy+c*this.ox}
         else if(time>this.next||Math.hypot(this.tx-this.x,this.ty-this.y)<20){this.tx=rand(60,w-60);this.ty=rand(60,h-60);this.next=time+rand(2,5)}
-      }else if(web&&web.state!=='fading'){if(web.state==='weaving'){const angle=time*1.8,r=web.size*.13;this.tx=web.x+Math.cos(angle)*r;this.ty=web.y+Math.sin(angle)*r}else{this.tx=web.x;this.ty=web.y}}else if(mode==='follow'&&active&&pointer.seen){this.tx=pointer.x;this.ty=pointer.y}
+      }else if(web&&web.state!=='fading'){if(web.state==='weaving'){const angle=time*1.8,r=web.size*(web.progress<1?(.12+.68*web.progress):.12);this.tx=web.x+Math.cos(angle)*r;this.ty=web.y+Math.sin(angle)*r}else{this.tx=web.x;this.ty=web.y}}else if(mode==='follow'&&active&&pointer.seen){this.tx=pointer.x;this.ty=pointer.y}
       else if(mode==='shy'&&pointer.seen){const dx=this.x-pointer.x,dy=this.y-pointer.y,d=Math.hypot(dx,dy)||1;if(d<260*u&&active){flee=true;this.tx=clamp(this.x+dx/d*240*u,40,w-40);this.ty=clamp(this.y+dy/d*240*u,40,h-40)}}
       else if(mode==='orbit'&&pointer.seen){const r=170*u,ang=time*.7*Number(C.speed.value)/90;this.tx=pointer.x+Math.cos(ang)*r;this.ty=pointer.y+Math.sin(ang)*r}
       else if(mode==='wander'){if(time>this.next||Math.hypot(this.tx-this.x,this.ty-this.y)<25*u){const m=Math.min(w,h)*.18;this.tx=rand(m,w-m);this.ty=rand(m,h-m);this.next=time+rand(2.5,5)}}
